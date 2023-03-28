@@ -1,0 +1,61 @@
+---
+header: 
+  seq: 14
+  stamp: 
+    secs: 0
+    nsecs:         0
+  frame_id: ''
+goal_id: 
+  stamp: 
+    secs: 0
+    nsecs:         0
+  id: "orientation"
+goal: 
+  target_pose: 
+    header: 
+      seq: 0
+      stamp: 
+        secs: 0
+        nsecs:         0
+      frame_id: ''
+    pose: 
+      position: 
+        x: 1.0
+        y: 0.0
+        z: 0.25
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 1.0
+        w: 6.123233995736766e-17
+---
+header: 
+  seq: 15
+  stamp: 
+    secs: 0
+    nsecs:         0
+  frame_id: ''
+goal_id: 
+  stamp: 
+    secs: 0
+    nsecs:         0
+  id: "position"
+goal: 
+  target_pose: 
+    header: 
+      seq: 0
+      stamp: 
+        secs: 0
+        nsecs:         0
+      frame_id: ''
+    pose: 
+      position: 
+        x: 0.0
+        y: 0.0
+        z: 0.25
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 1.0
+        w: 6.123233995736766e-17
+

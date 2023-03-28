@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<robot name="yn_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" value="3.14159274"/>
+
+  <xacro:include filename="$(find robot_description)/urdf/base/base.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/suspension/suspension.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/front_wheel/front_wheel.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/rear_wheel/rear_wheel.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/lrf/lrf.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/camera_stay/camera_stay.urdf.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/d435/_d435.urdf.xacro"/>
+
+  <!-- =============== Link & Joint =============== -->
+  <!-- Base -->
+  <link name="base_footprint"/>
+  <xacro:base_v0 parent="base_footprint">
+	<origin xyz="0 0 0"/>
+  </xacro:base_v0>
+
+  <!-- Suspension -->
+  <!-- Front Right Sus -->
+  <xacro:steering_v0 prefix="front_right" parent="base_link">
+	<origin xyz="0.21 -0.19 0.145" rpy="0 0 ${M_PI}"/>
+	<axis xyz="0 0 1"/>
+  </xacro:steering_v0>
+  <!-- Front Left Sus -->
+  <xacro:steering_v0 prefix="front_left" parent="base_link">
+	<origin xyz="0.21 0.19 0.145" rpy="0 0 ${M_PI}"/>
+	<axis xyz="0 0 1"/>
+  </xacro:steering_v0>
+
+  <!-- Wheel -->
+  <!-- Front Right Wheel -->
+  <xacro:front_wheel_v0 prefix="front_right" parent="front_right_steering_link">
+	<origin xyz="0.03 0 -0.105"/>
+	<axis xyz="0 1 0"/>
+  </xacro:front_wheel_v0>
+  <!--  Front Left Wheel -->
+  <xacro:front_wheel_v0 prefix="front_left" parent="front_left_steering_link">
+	<origin xyz="0.03 0 -0.105"/>
+	<axis xyz="0 -1 0"/>
+  </xacro:front_wheel_v0>
+  <!-- Rear Right Wheel -->
+  <xacro:rear_wheel_v0 prefix="right" parent="base_link">
+	<origin xyz="-0.1625 -0.22 0.1" rpy="0 0 0"/>
+	<axis xyz="0 1 0"/>
+  </xacro:rear_wheel_v0>
+  <!--  Rear Left Wheel -->
+  <xacro:rear_wheel_v0 prefix="left" parent="base_link">
+	<origin xyz="-0.1625 0.22 0.1" rpy="0 0 ${M_PI}"/>
+	<axis xyz="0 -1 0"/>
+  </xacro:rear_wheel_v0>
+
+  <!-- lrf sensor -->
+  <xacro:lrf_v0 prefix = "front" parent="base_link">
+	<origin xyz="-0.2 0 0.27" rpy="0 0 0"/>
+  </xacro:lrf_v0>
+
+  <link name="lrf_link"/>
+  <joint name="lrf_link_joint" type="fixed">
+	<parent link="base_link"/>
+	<child link="lrf_link"/>
+	<origin xyz="-0.2 0 0.29"/>
+  </joint>
+
+  <xacro:camera_stay_v0 parent="base_link">
+	<origin xyz="-0.2 0 0.3" rpy="${M_PI/2} 0 0"/>
+	<axis xyz="0 1 0"/>
+  </xacro:camera_stay_v0>
+
+  <!-- realsense -->
+  <xacro:sensor_d435 parent="camera_stay_link">
+	<origin xyz="0 0.08 0" rpy="${-M_PI/2} 0 0"/>
+  </xacro:sensor_d435>
+
+  <!-- ===============  Wheel Transmission =============== -->
+  <xacro:rear_wheel_trans_v0 prefix="right"/>
+  <xacro:rear_wheel_trans_v0 prefix="left"/>
+  <xacro:camera_stay_trans_v0 />
+
+  <!-- =============== Gazebo =============== -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+  </gazebo>
+
+  <!-- Base -->
+  <xacro:base_gazebo_v0/>
+
+  <!-- Wheel -->
+  <xacro:front_wheel_gazebo_v0 prefix="front_right"/>
+  <xacro:front_wheel_gazebo_v0 prefix="front_left"/>
+  <xacro:rear_wheel_gazebo_v0 prefix="right"/>
+  <xacro:rear_wheel_gazebo_v0 prefix="left"/>
+
+  <!-- Steering -->
+  <xacro:steering_gazebo_v0 prefix="front_right"/>
+  <xacro:steering_gazebo_v0 prefix="front_left"/>
+
+  <!-- lrf sensor -->
+  <xacro:lrf_gazebo_v0 prefix = "front" min_rad = "-1.658" max_rad = "1.658" min_range = "0.10" max_range = "15.0"/>
+
+  <!-- camera stay -->
+  <xacro:camera_stay_gazebo_v0 />
+
+</robot>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find robot_description)/urdf/camera_stay/camera_stay.transmission.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/camera_stay/camera_stay.gazebo.xacro"/>
+  
+  <xacro:macro name="camera_stay_v0" params="parent *joint_origin *joint_axis">
+	<joint name="camera_stay_joint" type="revolute">
+	  <xacro:insert_block name="joint_origin"/>
+	  <parent link="${parent}"/>
+	  <child link="camera_stay_link"/>
+          <limit effort="15" velocity="3" lower="-3.14" upper = "3.14"/>
+          <dynamics damping="0.005" friction="0.1"/> 
+	  <xacro:insert_block name="joint_axis"/>
+	</joint>
+
+	<link name="camera_stay_link">
+	  <visual>
+		<geometry>
+		  <mesh filename="package://robot_description/meshes/DAE/camera_stay/camera_stay.dae"/>
+		</geometry>
+	  </visual>
+	  <collision>
+		<geometry>
+		  <mesh filename="package://robot_description/meshes/STL/camera_stay/camera_stay.stl"/>
+		</geometry>
+	  </collision>
+	  <inertial>
+		<origin xyz="-0.019 0 -0.035"/>
+		<mass value="0.5"/>
+		<inertia ixx="0.000094" ixy="0" ixz="-0.000047" iyy="0.00016" iyz="0" izz="0.00011"/>
+	  </inertial>
+	</link>
+  </xacro:macro>
+  
+</robot>
+
