@@ -9,9 +9,6 @@ from PyQt5.QtGui import *
 from PyQt5.Qt import *
 from controller_window import Ui_Form
 
-# Realsense
-import pyrealsense2 as rs
-
 # ROS and create the /home/$USER/DataYO
 import rospy, math
 from std_msgs.msg import Float64
@@ -89,9 +86,10 @@ class GUI(QDialog):
         self.timer.timeout.connect(self.update)
         self.timer.start(10)
 
-        self.base_map_dir = os.environ['ROS_WORKSPACES'] + "/src/mobile_rob_dev/maps/mymapDC_2022_11_08_07_33_PM.pgm"
+        # self.base_map_dir = os.environ['ROS_WORKSPACES'] + "/src/mobrob_mark/maps/mob_rob_2023_01_30__15_33_22.pgm"
+        self.base_map_dir = os.environ['ROS_WORKSPACES'] + "/src/mobrob_mark/maps/mob_rob_2023_01_30__15_33_22.png"
 
-        yaml_path = os.environ['ROS_WORKSPACES'] + "/src/mobile_rob_dev/maps/mymapDC_2022_11_08_07_33_PM.yaml"
+        yaml_path = os.environ['ROS_WORKSPACES'] + "/src/mobrob_mark/maps/mob_rob_2023_01_30__15_33_22.yaml"
         with open(yaml_path) as f:
             map_data = yaml.safe_load(f)
 
@@ -108,11 +106,11 @@ class GUI(QDialog):
         self.bounds = self.find_bounds(map_image)
         print(f"bounds : {self.bounds}")
 
-        #self.ui.camera_slider.setValue(0)
-        #self.pub_camera_angle = rospy.Publisher('/camera_stay_controller/command', Float64, queue_size = 10)
+        self.ui.camera_slider.setValue(0) #???
+        self.pub_camera_angle = rospy.Publisher('/camera_stay_controller/command', Float64, queue_size = 10) #???
 
         #YOLOv5
-        weights='yolov5s.pt'  # model.pt path(s)
+        weights='models/yolov5s.pt'  # model.pt path(s)
         self.imgsz=640  # inference size (pixels)
         self.conf_thres=0.25  # confidence threshold
         self.iou_thres=0.45  # NMS IOU threshold
@@ -157,15 +155,15 @@ class GUI(QDialog):
         if self.device.type != 'cpu':
             self.model(torch.zeros(1, 3, imgsz, imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once     
 
-        #self.fx = 379.4980
-        #self.fy = 379.4980
-        #self.cx = 321.9203 # Realsense camera width resolution is 640
-        #self.cy = 240.9855 # Realsense camera heigh resolution is 480
+        #self.fx = 379.4980 # focal distance
+        #self.fy = 379.4980 # focal distance
+        #self.cx = 321.9203 # Realsense camera width resolution is 640, optical center, x coordinate
+        #self.cy = 240.9855 # Realsense camera heigh resolution is 480, optical center, y coordinate
 
-        self.fx = 347.9976
-        self.fy = 347.9976
-        self.cx = 320
-        self.cy = 240
+        self.fx = 347.9976 # focal distance
+        self.fy = 347.9976 # focal distance
+        self.cx = 320 # optical center, x coordinate
+        self.cy = 240 # optical center, y coordinate
 
         #self.move_base_msg = MoveBaseActionGoal()
         #self.pub_goal = rospy.Publisher('/control/move_base', MoveBaseActionGoal, queue_size=10)
@@ -173,7 +171,7 @@ class GUI(QDialog):
         self.pub_goal = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
 
     def repaint(self, img, X, Y, yaw, targets):
-        global robot_pose, robot_orientation#, cv_color_image
+        global robot_pose, robot_orientation#, cv_color_image ???
 
         if(self.first_time):
             self.scene = GraphicsScene(self.ui.graphicsView_2) # map
@@ -194,7 +192,8 @@ class GUI(QDialog):
         self.scene2.addItem(self.item)
         self.ui.graphicsView.setScene(self.scene2)
 
-        C = 30
+        #draw a mobile robot as a Pentagon
+        C = 30 #???
         robot_vertices = [[(X + C*(- 0.25*math.sin(yaw))),                       (Y + C*(0.25*math.cos(yaw)))], 
                           [(X + C*(-0.2*math.cos(yaw) - 0.15*math.sin(yaw))),    (Y + C*(-0.2*math.sin(yaw) + 0.15*math.cos(yaw)))], 
                           [(X + C*(-0.2*math.cos(yaw) - (-0.15)*math.sin(yaw))), (Y + C*(-0.2*math.sin(yaw) - 0.15*math.cos(yaw)))],
@@ -206,6 +205,7 @@ class GUI(QDialog):
         brush_robot = QBrush(Qt.red)
         pen_robot.setWidth(2)
         self.scene.addPolygon(qpoly_robot, pen_robot, brush_robot)
+        #draw a target point as a green circle
         for i in range(len(targets)):
             self.scene.addEllipse(targets[i][0] - 6, targets[i][1] - 6, 12, 12, QPen(Qt.green), QBrush(Qt.green))
 
@@ -239,6 +239,8 @@ class GUI(QDialog):
         ### control the camera angle
         #camera_angle = -math.pi * float(self.ui.camera_slider.value())/180
         #self.pub_camera_angle.publish(camera_angle)
+        camera_angle = 0.0 #???
+        self.pub_camera_angle.publish(camera_angle) #???
 
         ### calculate the robot pose
         X_robot_in_map = (robot_pose[0] - float(self.yaml_origin[0])) / self.yaml_resolution
@@ -324,7 +326,7 @@ class GUI(QDialog):
                     #cv2.putText(img0, text, (int((xyxy[0] + xyxy[2])/2), int((xyxy[1] + xyxy[3])/2)), cv2.FONT_HERSHEY_PLAIN, 1, [0, 0, 0], thickness=1, lineType=cv2.LINE_AA)
                     #print(f"(text, label, X, Y) : {text}, {label}, {int((xyxy[0] + xyxy[2])/2)}, {int((xyxy[1] + xyxy[3])/2)}")
 
-                    camera_angle=-0.0
+                    # camera_angle=0.0 # -0.0 ???
 
                     # convert to robot coordinates
                     Y_robot = -(X*math.cos(camera_angle) - Z*math.sin(camera_angle))
@@ -438,8 +440,10 @@ rospy.init_node('controller_nn')
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = GUI()
-    rospy.Subscriber("/odom", Odometry, get_robot_pose)
-    rospy.Subscriber("/camera/color/image_raw", Image, callback_color_img)
-    rospy.Subscriber("/camera/depth/image_rect_raw", Image, callback_depth_img)
+    # rospy.Subscriber("/odom", Odometry, get_robot_pose)
+    rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, get_robot_pose)
+    rospy.Subscriber("/zed_node/rgb/image_rect_color", Image, callback_color_img)
+    rospy.Subscriber("/zed_node/depth/depth_registered", Image, callback_depth_img)
+    # rospy.Subscriber("/zed_node/point_cloud/cloud_registered", Image, callback_depth_img)
     window.show()
     sys.exit(app.exec_())

@@ -9,9 +9,6 @@ from PyQt5.QtGui import *
 from PyQt5.Qt import *
 from controller_window import Ui_Form
 
-# Realsense
-import pyrealsense2 as rs
-
 # ROS and create the /home/$USER/DataYO
 import rospy, math
 from std_msgs.msg import Float64
