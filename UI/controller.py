@@ -89,9 +89,9 @@ class GUI(QDialog):
         self.timer.timeout.connect(self.update)
         self.timer.start(10)
 
-        self.base_map_dir = os.environ['ROS_WORKSPACES'] + "/src/mobile_rob_dev/maps/mymapDC_2022_11_08_07_33_PM.pgm"
+        self.base_map_dir = os.environ['ROS_WORKSPACES'] + "/src/mobrob_mark/maps/mob_rob_2023_01_30__15_33_22.pgm"
 
-        yaml_path = os.environ['ROS_WORKSPACES'] + "/src/mobile_rob_dev/maps/mymapDC_2022_11_08_07_33_PM.yaml"
+        yaml_path = os.environ['ROS_WORKSPACES'] + "/src/mobrob_mark/maps/mob_rob_2023_01_30__15_33_22.yaml"
         with open(yaml_path) as f:
             map_data = yaml.safe_load(f)
 
@@ -439,7 +439,10 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = GUI()
     rospy.Subscriber("/odom", Odometry, get_robot_pose)
-    rospy.Subscriber("/camera/color/image_raw", Image, callback_color_img)
-    rospy.Subscriber("/camera/depth/image_rect_raw", Image, callback_depth_img)
+    # rospy.Subscriber("/camera/color/image_raw", Image, callback_color_img)
+    # rospy.Subscriber("/camera/depth/image_rect_raw", Image, callback_depth_img)
+    # rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, get_robot_pose)
+    rospy.Subscriber("/zed_node/rgb/image_rect_color", Image, callback_color_img)
+    rospy.Subscriber("/zed_node/depth/depth_registered", Image, callback_depth_img)
     window.show()
     sys.exit(app.exec_())
